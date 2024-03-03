@@ -4,11 +4,19 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server",
+    "server": "nodemon server",
+    "browser-sync": "browser-sync start --server 'path/to/your/client' --files 'path/to/your/client/**/*.*'",
+    "dev": "npx concurrently \"npm run server\" \"npm run browser-sync\""
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "express": "^4.16.4"
+  },
+  "devDependencies": {
+    "browser-sync": "^3.0.2",
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.1.0"
   }
 }
