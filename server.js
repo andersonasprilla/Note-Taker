@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
-const db = require('./db/db.json');
+let db = require('./db/db.json');
 const uuid = require('./helpers/uuid')
 
 const PORT = 3001;
@@ -25,7 +25,15 @@ app.get('/notes', (req, res) => {
 
 // API route to get all notes from the JSON file
 app.get('/api/notes', (req, res) => {
-    res.json(db)
+    fs.readFile('./db/db.json', 'utf-8', (err, data) => {
+        if(err) {
+            console.error(err)
+            return res.status(500).json({error: "Error reading notes data"})
+        }
+
+        const notes = JSON.parse(data)
+        res.json(notes)
+    });    
 
     console.info(`${req.method} request received to get notes`)
 })
@@ -40,18 +48,19 @@ app.post('/api/notes', (req, res) => {
         fs.readFile('./db/db.json', 'utf-8', (err, data) => {
             if(err) {
                 console.error(err)
-                return res.status(500..json({error: "Error reading notes data"}))
+                return res.status(500).json({error: "Error reading notes data"})
             }
     
             const notes = JSON.parse(data)
             notes.push(newNote)
-
+            db = newNote
             fs.writeFile('./db/db.json', JSON.stringify(notes, null, 4), (err) => {
                 if(err) {
                     console.error(err);
                     return res.status(500).json({ error: 'Error writing new note'}); 
                 }
-                res.json(newNote);
+                
+                res.json(db);
                 console.info(`${req.method} request to add a new note was successful`)
             });
         });    
@@ -83,12 +92,10 @@ app.delete('/api/notes/:id', (req, res) => {
             res.json({ message: 'Note successfully deleted' });
             console.info(`DELETE request to remove note with id ${noteId} was successful`);
         })
-        
+
     })
      
 })
-
-
 
 app.listen(PORT, () =>
   console.log(`App listening at http://localhost:${PORT}`)
